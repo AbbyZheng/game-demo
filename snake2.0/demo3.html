@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<style type="text/css">
+*{margin: 0;padding: 0;border: 0}
+  #div1 {width:400px; height:400px; overflow:hidden;background: url(images/grass.jpg)}
+  .eles0,.eles1,.eles2{width: 20px;height: 20px;float: left;}
+  .eles2{background: red;}
+  /*.eles0{background: url(images/grass.jpg) center top;}*/
+  .eles1{background: url(images/wall.png) center top;}
+  .apple,.drug{width: 20px; height: 20px;float: left;}  
+  .snake{background: red;width: 20px; height: 20px;}
+</style>
+<script type="text/javascript">
+  window.onload = function(){
+    var oDiv = document.getElementById('div1');
+    Game.init(oDiv,300,10);
+  }
+  //建立map
+ var Game = {
+    gk:[
+      {
+        map: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+              ],
+        snake: [{x:10,y:10}],
+        apple: [{}]
+      },{
+      map:[],
+      snake:[],
+      apple:[{}]
+      }
+    ],
+    init:function(oParent,speed,oneScore){
+      this.oParent = oParent;
+      this.speed = speed;
+      this.oneScore = oneScore;
+      this.creatMap(0); 
+    },
+    getByClass:function(oParent, cls){
+            if(document.getElementsByClassName){
+                return (oParent || document).getElementsByClassName(cls);
+            } else {
+                oParent   = oParent || document;
+                var res   = [],
+                    child = null,
+                    reg   = new RegExp('(^|\\s)' + cls + '(\\s|$)', 'i');
+                for(var i = 0, len = oParent.all.length; i < len; i ++){
+                    child = oParent.all[i];
+                    if(reg.test(child.className)){
+                        res.push(child);
+                    }
+                }
+                return res;
+            }
+    },
+    creatMap:function(iNow){
+      var arrayMap = [];
+      for(var i=0; i<this.gk[iNow].map.length;i++){
+        arrayMap.push('<div class="eles'+this.gk[iNow].map[i]+'" index="'+i+'"></div>');       
+      }      
+      this.oParent.innerHTML = arrayMap.join('');
+      this.creatSnake(0);
+      //console.log(this.gk[0].map)    
+      this.controlSnake(0);
+      this.creatApple(0);      
+    },
+    creatSnake:function(iNow){      
+      for(var i=0;i<this.gk[iNow].snake.length;i++){        
+        var snakeIndex = this.gk[iNow].snake[i].x+this.gk[iNow].snake[i].y*Math.sqrt(this.gk[iNow].map.length);
+        var oSnake = this.oParent.getElementsByTagName('div')[snakeIndex];
+        oSnake.className = "eles2";
+        this.gk[iNow].map[snakeIndex] = 2;
+        //console.log(this.gk[iNow].map);
+      }
+    },
+    creatApple:function(iNow){        
+        var appleNum = null;  
+        var self = this;      
+        var foodAppleArray = ['apple0','apple1','apple2'];
+        var drugArray = ['drug1','drug2']; 
+        var foodArray = ['apple','drug'];
+
+        var aDiveara = this.getByClass(this.oParent,'eles0');
+        
+        appleNum = parseInt(Math.random()*aDiveara.length);        
+        this.gk[iNow].apple.x = (aDiveara[appleNum].offsetLeft)/Math.sqrt(this.gk[iNow].map.length);
+        this.gk[iNow].apple.y = (aDiveara[appleNum].offsetTop)/Math.sqrt(this.gk[iNow].map.length);
+        
+        // this.gk[iNow].apple.x = 8;
+        // this.gk[iNow].apple.y = 10;
+        var appleIndex = this.gk[iNow].apple.x + this.gk[iNow].apple.y*Math.sqrt(this.gk[iNow].map.length);
+        // var appleIndex = 208;
+        //console.log(appleIndex)
+        var oApple = this.oParent.getElementsByTagName('div')[appleIndex];
+        //console.log(oApple.getAttribute('index'))
+        var oNum = Math.random()*foodArray.length | 0;
+        oApple.className = foodArray[oNum]; 
+        if(foodArray[oNum] == 'drug'){
+          oApple.style.background = 'url(images/'+drugArray[Math.random()*drugArray.length | 0]+'.png) center top' ;
+          var timerDrug = setTimeout(function(){
+            oApple.style.background = '';
+            oApple.className = 'eles0';
+            self.gk[iNow].apple.x = '';
+            self.gk[iNow].apple.y = '';
+            self.creatApple(0);
+          }, 10000)
+        }
+        else{
+          oApple.style.background = 'url(images/'+foodAppleArray[Math.random()*foodAppleArray.length | 0]+'.png) center top'
+        }
+              
+         
+    },
+   controlSnake:function(iNow){
+     var self = this;
+     var aDir=[];
+     self.timer = null;
+     self.json={
+      left  : {key:true},
+      up    : {key:true},
+      right : {key:true},
+      down  : {key:true}
+    };
+
+     document.onkeydown = function(ev){
+      var oEvent = ev || event; 
+
+      for(var i=37;i<41;i++){
+        if(oEvent.keyCode==i && oEvent.keyCode!=aDir[0]){
+           aDir.unshift(oEvent.keyCode);
+        }
+      }
+     
+      aDir.length=2;
+
+      if(Math.abs(aDir[0]-aDir[1])==2){return}
+      else{
+      switch(oEvent.keyCode){
+        case 37:   
+          if(!self.json.left.key)return;
+          self.onOff('left');                 
+          self.snakeMove(iNow,{x:-1})
+        break;
+        case 38:
+          if(!self.json.up.key)return;
+          self.onOff('up');                      
+          self.snakeMove(iNow,{y:-1})
+        break;
+        case 39:
+          if(!self.json.right.key)return;
+          self.onOff('right');                     
+         self.snakeMove(iNow,{x:1})
+        break;
+        case 40:   
+          if(!self.json.down.key)return;
+          self.onOff('down');                  
+          self.snakeMove(iNow,{y:1})
+        break;
+      }
+    }
+    }      
+   },
+   onOff:function(dir){
+      for(var i in this.json){
+        if(i==dir){
+          this.json[i].key=false;
+        }else{
+          this.json[i].key=true;
+          clearInterval(self.timer);
+        }
+      }
+    },
+   snakeMove:function(iNow,opt){
+    var xValue = opt.x || 0;
+    var yValue = opt.y || 0;    
+
+    var self = this;    
+
+    clearInterval(self.timer);
+    self.timer = setInterval(function(){
+            var pz = self.oParent.getElementsByTagName('div')[self.gk[iNow].snake[0].x+self.gk[iNow].snake[0].y*20];
+            if( pz.offsetLeft <= 0 || self.gk[iNow].map[pz.offsetLeft/20+pz.offsetTop+xValue+yValue*20] == 1 || pz.offsetLeft >= 380 || pz.offsetTop <= 0 || pz.offsetTop >= 380){
+               self.gameOver(iNow);
+            }
+            else{
+
+            var newNum1 = self.gk[iNow].snake[0].x + xValue;
+            var newNum2 = self.gk[iNow].snake[0].y + yValue;  
+            //console.log([newNum1,newNum2])
+            if(self.gk[iNow].apple.x == newNum1 && self.gk[iNow].apple.y == newNum2){
+              if(self.oParent.getElementsByTagName('div')[newNum1+newNum2*20].className == 'drug'){                
+                  alert('吃到毒药了！你太衰了！');
+                  self.gameOver(iNow);   
+              }
+              self.gk[iNow].snake = [{x:newNum1,y:newNum2}].concat(self.gk[iNow].snake); 
+                                                      
+              self.creatApple(iNow);
+              // console.log(self.gk[iNow].map)
+            }
+            else{  
+              self.gk[iNow].snake = [{x:newNum1,y:newNum2}].concat(self.gk[iNow].snake);           
+              var snakeDiv = self.gk[iNow].snake.pop();
+              self.oParent.getElementsByTagName('div')[snakeDiv.x+snakeDiv.y*20].className = 'eles0';
+              self.oParent.getElementsByTagName('div')[snakeDiv.x+snakeDiv.y*20].style.background = '';
+              //console.log(snakeLeft)              
+              self.creatSnake(iNow)
+            }
+         } 
+            //console.log(self.gk[iNow].snake)                    
+          }, self.speed)
+   },
+   nextGk:function(){
+
+   },
+   gameOver:function(iNow){
+    var score = (this.gk[iNow].snake.length-1)*this.oneScore;
+    alert('游戏结束,您本次得分'+score+'!');
+    location.reload();
+   }
+  }
+</script>
+</head>
+<body>
+    <div id="div1"></div>
+</body>
+</html>

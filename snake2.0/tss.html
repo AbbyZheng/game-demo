@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+</head>
+<body>
+    <script type="text/javascript">
+      window.onload = function(){
+        var oBigDiv = document.createElement('div');
+        oBigDiv.style.cssText = 'width:600px; height:600px; overflow:hidden;';
+        document.body.appendChild(oBigDiv);
+        //小格子div
+        var arrayAllDdiv = [];        
+        for(var i=0;i<400;i++){          
+          var oSmallDiv = document.createElement('div');
+          oSmallDiv.style.cssText = 'width:28px; height:28px; border:1px solid red; float:left';
+          oSmallDiv.setAttribute('number', i);
+          oBigDiv.appendChild(oSmallDiv);
+          arrayAllDdiv.push(oSmallDiv);
+        }
+      //蛇的初始位置
+      var snakeArray = [189,190,191];
+      for(var i=0;i<snakeArray.length;i++){
+        for(var j=0;j<arrayAllDdiv.length;j++){          
+          if(arrayAllDdiv[j].getAttribute('number')==snakeArray[i]){
+            arrayAllDdiv[j].style.cssText = 'background:red; width: 28px; height: 28px; border: 1px solid red; float: left;'
+          }          
+        }
+      }
+      //判断一个数字是否是一个array中的元素（借用）
+      function hasInArray(number,array){
+      for(var i in array){        
+        if(array[i].getAttribute && array[i].getAttribute('number') == number) {return true;}
+        else{
+          return false;
+        }
+      }
+      
+    }
+      //苹果
+      function food(){
+        var appleArray = []; 
+        var appleNum = null;          
+        
+        for(var k=0;k<arrayAllDdiv.length;k++){          
+          if(!hasInArray(arrayAllDdiv[k].getAttribute('number'),snakeArray)){
+            appleArray.push(arrayAllDdiv[k]);
+          }
+       
+        }
+         appleNum = parseInt(Math.random()*appleArray.length);
+         window.foodNum = appleNum
+         console.log(window.foodNum)
+        // window.foodNum = appleNum = 187
+        window.timerA = setInterval(function(){
+          if(appleArray[appleNum].className == 'shanshuo'){
+            appleArray[appleNum].className = ''
+            appleArray[appleNum].style.backgroundColor = '#fff'
+          }
+          else{
+            appleArray[appleNum].className = 'shanshuo';
+            appleArray[appleNum].style.backgroundColor = '#f00'
+          }
+        },500);                
+      }
+      food();
+
+      console.log(window.foodNum)
+      //上下左右控制蛇移动有bug
+      //var controlBtn = true;//加一个开关控制重复点击
+      var timer = null;      
+      document.onkeydown = function(e){
+        var e = e || event; 
+        clearInterval(timer);       
+        //左
+        if(e.keyCode==37){
+          //controlBtn = false;
+          clearInterval(timer);
+          timer = setInterval(function(){           
+          if(snakeArray[0]%20<=0){                                   
+              alert('游戏结束');
+              location.reload();             
+            }             
+          else{ 
+              var newNum1 = snakeArray[0]-1;
+                  
+                if(window.foodNum==newNum1){                
+                 snakeArray = [newNum1].concat(snakeArray);
+                //  for(var i=0;i<snakeArray.length;i++){ 
+                //    arrayAllDdiv[snakeArray[i]].style.cssText = 'background:red; width: 28px; height: 28px; border: 1px solid red; float: left;'
+                // } 
+                clearInterval(window.timerA)
+                food();               
+                } 
+                else{
+                  var div1 = snakeArray.pop();
+                  arrayAllDdiv[div1].style.background = '#fff';
+                  snakeArray = [newNum1].concat(snakeArray);
+
+                  for(var i=0;i<snakeArray.length;i++){ 
+                     arrayAllDdiv[snakeArray[i]].style.cssText = 'background:red; width: 28px; height: 28px; border: 1px solid red; float: left;'
+                  }
+              }              
+              
+          }   
+           
+          }, 300)
+        };
+        //上        
+        if(e.keyCode==38){ 
+          clearInterval(timer);
+          timer = setInterval(function(){          
+          if(snakeArray[0]/20<=1){                                   
+              alert('游戏结束');
+              location.reload();             
+            }
+          else{
+            var newNum2 = snakeArray[0]-20;
+               if(window.foodNum==newNum2){                
+                 snakeArray = [newNum2].concat(snakeArray);
+                //  for(var i=0;i<snakeArray.length;i++){ 
+                //    arrayAllDdiv[snakeArray[i]].style.cssText = 'background:red; width: 28px; height: 28px; border: 1px solid red; float: left;'
+                // }
+                clearInterval(window.timerA) 
+                food();               
+                } 
+                else{
+                  var div2 = snakeArray.pop();
+                  arrayAllDdiv[div2].style.background = '#fff';
+                  snakeArray = [newNum2].concat(snakeArray);
+
+                  for(var i=0;i<snakeArray.length;i++){ 
+                     arrayAllDdiv[snakeArray[i]].style.cssText = 'background:red; width: 28px; height: 28px; border: 1px solid red; float: left;'
+                  }
+                }
+            } 
+          }, 300)
+        }
+        //右注意数组反转
+        if(e.keyCode==39){          
+          clearInterval(timer);
+          // snakeArray = snakeArray.reverse();
+          timer = setInterval(function(){ 
+          if(snakeArray[0]%20>=19){                                   
+            alert('游戏结束');
+            location.reload();             
+          }
+          else{            
+            var newNum3 = snakeArray[0]+1;            
+            if(window.foodNum==snakeArray[0]+1){                
+               snakeArray = [newNum3].concat(snakeArray);
+              //  for(var i=0;i<snakeArray.length;i++){ 
+              //    arrayAllDdiv[snakeArray[i]].style.cssText = 'background:red; width: 28px; height: 28px; border: 1px solid red; float: left;'
+              // }
+              clearInterval(window.timerA) 
+              food();               
+            } 
+            else{
+              var div3 = snakeArray.pop();
+              arrayAllDdiv[div3].style.background = '#fff';
+              snakeArray = [newNum3].concat(snakeArray);
+
+              for(var i=0;i<snakeArray.length;i++){ 
+                 arrayAllDdiv[snakeArray[i]].style.cssText = 'background:red; width: 28px; height: 28px; border: 1px solid red; float: left;'
+              }
+            }
+          }        
+           
+          }, 300)
+        }
+        //下
+        if(e.keyCode==40){          
+          clearInterval(timer);
+          timer = setInterval(function(){         
+           if(snakeArray[0]/20>=19){                                   
+              alert('游戏结束');
+              location.reload();             
+            } 
+          else{
+            var newNum4 = snakeArray[0]+20;
+            if(window.foodNum==newNum4){
+              snakeArray = [newNum4].concat(snakeArray);
+              //  for(var i=0;i<snakeArray.length;i++){ 
+              //    arrayAllDdiv[snakeArray[i]].style.cssText = 'background:red; width: 28px; height: 28px; border: 1px solid red; float: left;'
+              // }
+              clearInterval(window.timerA) 
+              food(); 
+            }
+            else{
+              var div4 = snakeArray.pop();
+             arrayAllDdiv[div4].style.background = '#fff';
+             snakeArray = [newNum4].concat(snakeArray);
+             for(var i=0;i<snakeArray.length;i++){           
+              
+               arrayAllDdiv[snakeArray[i]].style.cssText = 'background:red; width: 28px; height: 28px; border: 1px solid red; float: left;'
+            }
+            }
+          } 
+          }, 300)
+        }
+      }
+      }
+      
+    </script>
+</body>
+</html>

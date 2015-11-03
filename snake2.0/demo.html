@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<style type="text/css">
+*{margin: 0;padding: 0;border: 0}
+  #div1 {width:400px; height:400px; overflow:hidden;}
+  .eles0,.eles1,.eles2{width: 20px;height: 20px;float: left;}
+  .eles0{background: url(images/grass.jpg) center top;}
+  .eles1{background: url(images/wall.png) center top;}
+  .apple{background: url(images/apple.png) center top; width: 20px; height: 20px;}  
+  .snake{background: red;width: 20px; height: 20px;}
+</style>
+<script type="text/javascript">
+  window.onload = function(){
+    var oDiv = document.getElementById('div1');
+    Game.init(oDiv,300,10);
+  }
+  //建立map
+  var Game = {
+    gk:[
+      {
+        map: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+              0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+              ],
+        snake: [{x:10,y:10}],
+        apple: {}
+      }
+    ],
+    init:function(oParent,speed,oneScore){
+      this.oParent = oParent;
+      this.speed = speed;
+      this.oneScore = oneScore;
+      this.creatMap(0);
+    },
+    getByClass:function(oParent, cls){
+            if(document.getElementsByClassName){
+                return (oParent || document).getElementsByClassName(cls);
+            } else {
+                oParent   = oParent || document;
+                var res   = [],
+                    child = null,
+                    reg   = new RegExp('(^|\\s)' + cls + '(\\s|$)', 'i');
+                for(var i = 0, len = oParent.all.length; i < len; i ++){
+                    child = oParent.all[i];
+                    if(reg.test(child.className)){
+                        res.push(child);
+                    }
+                }
+                return res;
+            }
+    },
+    creatMap:function(iNow){
+      var arrayMap = [];
+      for(var i=0; i<this.gk[iNow].map.length;i++){
+        arrayMap.push('<div class="eles'+this.gk[iNow].map[i]+'" index="'+i+'"></div>');       
+      }      
+      this.oParent.innerHTML = arrayMap.join('');
+      this.creatSnake(0);
+      //console.log(this.gk[0].map)      
+      this.controlSnake(0);
+      this.creatApple(0);
+    },
+    creatSnake:function(iNow){      
+      for(var i=0;i<this.gk[iNow].snake.length;i++){
+        var oSnake = document.createElement('div');
+        oSnake.className = 'snake';
+        oSnake.style.position = 'absolute';
+        oSnake.style.left = this.gk[iNow].snake[i].x*20+'px';
+        oSnake.style.top = this.gk[iNow].snake[i].y*20+'px';
+        this.oParent.appendChild(oSnake);
+        
+         
+      }
+    },
+    creatApple:function(iNow){        
+        var appleNum = null;
+        
+        var aDiveara = this.getByClass(this.oParent,'eles0');
+        
+        appleNum = parseInt(Math.random()*aDiveara.length);
+        this.gk[iNow].apple.x = aDiveara[appleNum].offsetLeft;
+        this.gk[iNow].apple.y = aDiveara[appleNum].offsetTop;
+
+        var oApple = document.createElement('div');
+        oApple.className = 'apple';
+        oApple.style.position = 'absolute';
+        oApple.style.left = this.gk[iNow].apple.x +'px';
+        oApple.style.top = this.gk[iNow].apple.y + 'px';
+        // oApple.style.left = 180 +'px';
+        // oApple.style.top = 200 + 'px';
+        this.oParent.appendChild(oApple);
+         
+    },
+   controlSnake:function(iNow){
+     var self = this;
+     var timer = null;
+
+     document.onkeydown = function(ev){
+      var oEvent = ev || event;           
+      switch(oEvent.keyCode){
+        case 37: 
+          clearInterval(timer);         
+           timer = setInterval(function(){
+            var pz = self.getByClass(self.oParent,'snake')[self.getByClass(self.oParent,'snake').length-1];
+            if( pz.offsetLeft == 0 || self.gk[iNow].map[pz.offsetLeft/20+pz.offsetTop-1]==1){
+               self.gameOver(iNow);
+            }
+            else{
+
+            var newNum1 = self.gk[iNow].snake[0].x -1;
+           
+            var appleLeft = self.getByClass(this.oParent,'apple')[0].offsetLeft;
+            var appleTop = self.getByClass(this.oParent,'apple')[0].offsetTop;
+            
+            if(appleLeft == newNum1*20 && appleTop == self.gk[iNow].snake[0].y*20){
+              self.gk[iNow].snake = [{x:newNum1,y:self.gk[iNow].snake[0].y}].concat(self.gk[iNow].snake);
+              for(var j=0;j<self.getByClass(this.oParent,'snake').length;j++){
+                self.oParent.removeChild(self.getByClass(this.oParent,'snake')[j])
+              }              
+              self.creatSnake(iNow);
+              self.oParent.removeChild(self.getByClass(this.oParent,'apple')[0]);
+              self.creatApple(iNow);
+              // console.log(self.gk[iNow].map)
+            }
+            else{   
+              self.gk[iNow].snake = [{x:newNum1,y:self.gk[iNow].snake[0].y}].concat(self.gk[iNow].snake);           
+              var snakeLeft = self.gk[iNow].snake.pop();
+
+              for(var k=0;k<self.gk[iNow].map.length;k++){
+                if(self.gk[iNow].map[k]==2){
+                  self.gk[iNow].map[k] = 0;
+                }
+              }
+
+              for(var i=0;i<self.gk[iNow].snake.length;i++){
+
+               self.getByClass(self.oParent,'snake')[i].style.left = (newNum1-i)*20 + 'px';               
+               //self.getByClass(self.oParent,'snake')[i].style.top = (newNum2-i)*20 + 'px';
+               //self.getByClass(self.oParent,'snake')[i].style.top = (newNum2+i)*20 + 'px';
+               //self.getByClass(self.oParent,'snake')[i].style.left = (newNum1+i)*20 + 'px';
+                var snakeIndex = (newNum1-i) + self.gk[iNow].snake[i].y*20;
+                self.gk[iNow].map[snakeIndex] = 2;
+                self.gk[iNow].map = self.gk[iNow].map;
+                //console.log(self.gk[iNow].map) 
+              }
+             
+            }
+           
+         } 
+            
+            //console.log(self.gk[iNow].snake)                    
+          }, self.speed)
+        break;
+        case 38:
+        
+        break;
+        case 39:
+         
+        break;
+        case 40:
+         
+        break;
+      }
+    }      
+   },
+   snakeMove:function(iNow,opt){
+    var xValue = opt.x || 0;
+    var yValue = opt.y || 0;
+    
+
+    var self = this;
+    timer = setInterval(function(){
+            var pz = self.getByClass(self.oParent,'snake')[self.getByClass(self.oParent,'snake').length-1];
+            if( pz.offsetLeft == 0 || self.gk[iNow].map[pz.offsetLeft/20+pz.offsetTop+yValue+xValue]==1 || pz.offsetLeft == 380 || pz.offsetTop == 0 || pz.offsetTop == 380){
+               self.gameOver(iNow);
+            }
+            else{
+
+            var newNum1 = self.gk[iNow].snake[0].x + xValue;
+            var newNum2 = self.gk[iNow].snake[0].y +　yValue;
+            var appleLeft = self.getByClass(this.oParent,'apple')[0].offsetLeft;
+            var appleTop = self.getByClass(this.oParent,'apple')[0].offsetTop;
+            
+            if(appleLeft == newNum1*20 && appleTop == self.gk[iNow].snake[0].y*20){
+              self.gk[iNow].snake = [{x:newNum1,y:nweNum2}].concat(self.gk[iNow].snake);
+              for(var j=0;j<self.getByClass(this.oParent,'snake').length;j++){
+                self.oParent.removeChild(self.getByClass(this.oParent,'snake')[j])
+              }              
+              self.creatSnake(iNow);
+              self.oParent.removeChild(self.getByClass(this.oParent,'apple')[0]);
+              self.creatApple(iNow);
+              // console.log(self.gk[iNow].map)
+            }
+            else{   
+              self.gk[iNow].snake = [{x:newNum1,y:newNum2}].concat(self.gk[iNow].snake);           
+              var snakeLeft = self.gk[iNow].snake.pop();
+
+              for(var k=0;k<self.gk[iNow].map.length;k++){
+                if(self.gk[iNow].map[k]==2){
+                  self.gk[iNow].map[k] = 0;
+                }
+              }
+
+              for(var i=0;i<self.gk[iNow].snake.length;i++){
+
+                //self.getByClass(self.oParent,'snake')[i].style.left = (newNum1-i)*20 + 'px';
+               //self.getByClass(self.oParent,'snake')[i].style.top = (newNum2-i)*20 + 'px';
+               //self.getByClass(self.oParent,'snake')[i].style.top = (newNum2+i)*20 + 'px';
+               self.getByClass(self.oParent,'snake')[i].style.left = (newNum1+i)*20 + 'px';
+                var snakeIndex = (newNum1-i) + self.gk[iNow].snake[i].y*20;
+                self.gk[iNow].map[snakeIndex] = 2;
+                self.gk[iNow].map = self.gk[iNow].map;
+                //console.log(self.gk[iNow].map) 
+              }
+             
+            }
+           
+         } 
+            
+            //console.log(self.gk[iNow].snake)                    
+          }, self.speed)
+   },
+   nextGk:function(){
+
+   },
+
+   gameOver:function(iNow){
+    var score = (this.gk[iNow].snake.length-1)*this.oneScore;
+    alert('游戏结束,您本次得分'+score+'!');
+    location.reload();
+   }
+
+  }
+</script>
+</head>
+<body>
+    <div id="div1"></div>
+</body>
+</html>
